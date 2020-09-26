@@ -1,29 +1,32 @@
-from string import ascii_letters
 from abc import ABCMeta, abstractmethod, ABC
-from dataclasses import dataclass
+from string import ascii_letters
+from string import digits
+import logging
 
 POSTFIX_LETTERS = ',.\x20'
 RU_LETTERS = 'абвгдежзийклмнопрстуфхцшщъыьэюя'
 
 
-@dataclass
 class Letters:
-    RU = f'{RU_LETTERS}{RU_LETTERS.upper()}{POSTFIX_LETTERS}'
-    EN = f'{ascii_letters}{POSTFIX_LETTERS}'
+    RU = RU_LETTERS + RU_LETTERS.upper() + POSTFIX_LETTERS
+    EN = ascii_letters + POSTFIX_LETTERS
+    DIGITS = digits
     current: str
 
 
-class Crypto(object):
+class BaseCrypto(object):
     """ Базовый класс, описывающий сущность шифрования """
     __metaclass__ = ABCMeta
-    letters = str
+    letters = Letters.RU
     message: str
-    hint_title: str
 
-    def __init__(self, message: str, letters: str):
-        self.letters = letters
+    def __init__(self, message: str, letters=None):
         self.message = message
-        self.__check_letters__()
+        if letters:
+            self.letters = letters
+            self._check_letters()
+        else:
+            self.__set_letters__()
 
     @abstractmethod
     def encrypt(self) -> str:
@@ -35,26 +38,50 @@ class Crypto(object):
 
     def get_hint(self) -> str:
         """ Формирует подсказку на примере алфавита """
-        old_message, self.message = self.message, self.letters
-        hint = f"{self.hint_title}:\n{self.letters}\n{self.encrypt()}"
+        old_message = self.message
+        self.message = self.letters
+        hint = f"\n{self.letters}\n{self.encrypt()}"
         self.message = old_message
         return hint
 
-    def __check_letters__(self):
+    def __set_letters__(self):
+        """ Выбирает язык символов алфавита En/Ru """
+
+        # Перебор алфавитов
+        def roll_letters(with_digits=False):
+            for i, key in enumerate(Letters.__dict__):
+                if i < len(Letters.__dict__):
+                    if not key.startswith('__'):
+                        self.letters = Letters.__dict__[key] + Letters.DIGITS if with_digits else ''
+                        if not self.__is_letters_error__():
+                            break
+
+            if not with_digits:
+                roll_letters(with_digits=True)
+
+            self._check_letters()
+        roll_letters()
+
+    def _check_letters(self):
+        is_error = self.__is_letters_error__()
+        if is_error:
+            raise SyntaxError(f'Character "{is_error}" was not found in chosen letters: "{self.letters}"')
+
+    def __is_letters_error__(self):
         """ Проверяет соответствие сообщения выбранному алфавиту """
         for char in self.message:
             if char not in self.letters:
-                print(char, 'not in ', self.letters)
-                raise SyntaxError(f'The message does not match the selected letters ({self.letters})')
+                return char
 
-    def __get_char_sequence__(self) -> tuple:
-        """ Генератор последовательность номеров букв сообщения в открытом алфавите
-        :rtype: tuple (int: Номер буквы сообщения в открытом алфавите, str: буква сообщения)
-        """
-        for find_char in self.message:
-            for i, char in enumerate(self.letters):
-                if char == find_char:
-                    yield i + 1, char
+        return False
 
-    def __get_char_from_letters_number__(self, i: int) -> str:
-        return self.letters[i - 1]
+    def _ord(self, char: str) -> int:
+        return list(self.letters).index(char)
+
+    def _chr(self, index: int) -> str:
+        return list(self.letters)[index]
+
+
+if __name__ == '__main__':
+    s = BaseCrypto('test руский')
+    print(s.letters)
