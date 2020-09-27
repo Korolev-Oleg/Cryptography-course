@@ -7,15 +7,25 @@ from crypto.unambiguousCiphers import (
     PolybiusSquare)
 
 
-def __choice_letters__():
+def clear():
+    os.system('clear' if not os.name == 'nt' else 'cls')
+
+
+def pause(msg=None):
+    input(msg if msg else 'Enter для продолжения...')
+
+
+def choice_letters():
     """ Выбор алфавита в консоле """
     global letters
+    clear()
     print(f"""Выбирите вариант алфавита:
     1) Авто
     2) Свой
     3) {Letters.RU}
     4) {Letters.EN}
-    5) Выход""")
+    5) {Letters.DIGITS}
+    6) Выход""")
 
     choice = int(input(': '))
     if choice == 1:
@@ -26,19 +36,22 @@ def __choice_letters__():
         letters = Letters.RU
     elif choice == 4:
         letters = Letters.EN
+    elif choice == 5:
+        letters = Letters.DIGITS
     else:
         exit()
+
 
     return letters
 
 
-def __choice_of_cipher__(m, l):
+def choice_of_cipher(m, l):
     """ выбор шифшра в консоле """
+    clear()
     print(f"""Выбирите шифр:
     1) Шифр АТБАШ,.
     2) Шифр Цезаря
-    3) Квадрат Полибия
-    """)
+    3) Квадрат Полибия""")
 
     choice = int(input(': '))
     if choice == 1:
@@ -51,20 +64,30 @@ def __choice_of_cipher__(m, l):
     return chosen_cipher
 
 
-def pause(msg=None):
-    input(msg if msg else 'Enter для продолжения...')
-    os.system('cls' if os.name == 'nt' else 'clear')
+def choice_method(cipher):
+    clear()
+    print(f"""Выбирите метод:
+    1) Зашифровать
+    2) Расшифровать
+    """)
+    chose = int(input())
+    if chose == 1:
+        return cipher.encrypt
+    else:
+        return cipher.decrypt
 
 
 if __name__ == '__main__':
     while True:
+        clear()
         message = str(input(f"Введите сообщение: ")).replace('\n', '').strip()
-        letters = __choice_letters__()
+        letters = choice_letters()
         try:
-            cipher = __choice_of_cipher__(message, letters)
-            print(cipher.get_hint(), end='\n\n')
+            cipher = choice_of_cipher(message, letters)
+            cipher_method = choice_method(cipher)
+            clear()
             print('X =', message)
-            print('Y =', cipher.encrypt())
+            print('Y =', cipher_method())
             pause()
-        except SyntaxError as error:
+        except Exception as error:
             pause(error)
