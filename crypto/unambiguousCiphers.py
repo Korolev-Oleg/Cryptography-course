@@ -54,6 +54,11 @@ class PolybiusSquare(BaseCrypto):
     square = []
     cut: int
 
+    def __init__(self, message: str, letters=None):
+        if letters and Letters.DIGITS not in letters:
+            letters += Letters.DIGITS
+        super().__init__(message, letters)
+
     def render_square(self):
         cut = 0
         while pow(cut, 2) < len(self.letters):
@@ -85,7 +90,6 @@ class PolybiusSquare(BaseCrypto):
         return self.square[row][col]
 
     def encrypt(self, list_result=False) -> Any:
-
         keys = []
         for char in self.message:
             keys.append(self.ord(char))
@@ -103,9 +107,12 @@ class PolybiusSquare(BaseCrypto):
         else:
             keys_list = self.message
 
-        return ''.join([self.chr(row=int(row), col=int(col)) for row, col in keys_list])
+        try:
+            return ''.join([self.chr(row=int(row), col=int(col)) for row, col in keys_list])
+        except ValueError as e:
+            raise ValueError(f'введенное сообщение "{self.message}" не является ключем. Введите ключ или измените метод')
 
 
 if __name__ == '__main__':
-    crypto = PolybiusSquare('21 04 20 21 60 13 04 20 20 00 06 04', letters=Letters.EN)
+    crypto = PolybiusSquare('тестовое мсг')
     print(crypto.decrypt())
