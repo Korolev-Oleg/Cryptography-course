@@ -110,9 +110,10 @@ class PolybiusSquare(BaseCrypto):
         try:
             return ''.join([self.chr(row=int(row), col=int(col)) for row, col in keys_list])
         except ValueError as e:
-            raise ValueError(f'введенное сообщение "{self.message}" не является ключем. Введите ключ или измените метод')
+            err_msg = f'введенное сообщение "{self.message}" не является ключем. Введите ключ или измените метод'
+            raise IOError(err_msg)
 
 
 if __name__ == '__main__':
-    crypto = PolybiusSquare('тестовое мсг')
-    print(crypto.decrypt())
+    crypto = PolybiusSquare('Test message')
+    print(crypto.encrypt())
