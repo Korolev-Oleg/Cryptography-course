@@ -1,7 +1,6 @@
 from abc import ABCMeta, abstractmethod, ABC
 from string import ascii_letters
 from string import digits
-import logging
 
 POSTFIX_LETTERS = ',.\x20'
 RU_LETTERS = 'абвгдежзийклмнопрстуфхцшщъыьэюя'
@@ -23,8 +22,12 @@ class BaseCrypto(object):
     def __init__(self, message: str, letters=None):
         self.message = message
         if letters:
-            self.letters = letters
-            self._check_letters()
+            try:
+                self.letters = letters
+                self._check_letters()
+            except SyntaxError:
+                self.letters = letters + Letters.DIGITS
+                self._check_letters()
         else:
             self.__set_letters__()
 
