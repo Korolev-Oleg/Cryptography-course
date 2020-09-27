@@ -68,7 +68,7 @@ class BaseCrypto(object):
     def _check_letters(self):
         is_error = self.__is_letters_error__()
         if is_error:
-            raise SyntaxError(f'Character "{is_error}" was not found in chosen letters: "{self.letters}"')
+            raise SyntaxError(f'Символ "{is_error}" не найден в выбранном алфавите: "{self.letters}"')
 
     def __is_letters_error__(self):
         """ Проверяет соответствие сообщения выбранному алфавиту """
