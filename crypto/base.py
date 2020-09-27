@@ -3,7 +3,7 @@ from string import ascii_letters
 from string import digits
 
 POSTFIX_LETTERS = ',.\x20'
-RU_LETTERS = 'абвгдежзийклмнопрстуфхцшщъыьэюя'
+RU_LETTERS = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 
 
 class Letters:
