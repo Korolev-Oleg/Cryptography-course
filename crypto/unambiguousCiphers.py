@@ -55,8 +55,8 @@ class PolybiusSquare(BaseCrypto):
     cut: int
 
     def __init__(self, message: str, letters=None):
-        if letters and Letters.DIGITS not in letters:
-            letters += Letters.DIGITS
+        if letters and Letters.SYMBOLS not in letters:
+            letters += Letters.SYMBOLS
         super().__init__(message, letters)
 
     def render_square(self):
@@ -89,6 +89,12 @@ class PolybiusSquare(BaseCrypto):
 
         return self.square[row][col]
 
+    def get_hint(self) -> str:
+        self.render_square()
+        hint = ' '.join([str(i - 1) for i in range(0, len(self.square[0]) + 1)]).replace('-1', ' ') + '\n'
+        hint += '\n'.join([f'{i} {" ".join(x for x in line)}' for i, line in enumerate(self.square)])
+        return hint
+
     def encrypt(self, list_result=False) -> Any:
         keys = []
         for char in self.message:
@@ -115,5 +121,6 @@ class PolybiusSquare(BaseCrypto):
 
 
 if __name__ == '__main__':
-    crypto = PolybiusSquare('Test message')
+    crypto = PolybiusSquare(r'Test massage!')
+    print(crypto.get_hint())
     print(crypto.encrypt())
