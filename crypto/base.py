@@ -2,14 +2,14 @@ from abc import ABCMeta, abstractmethod, ABC
 from string import ascii_letters
 from string import digits
 
-POSTFIX_LETTERS = ',.\x20'
+SPACE = ',.\x20'
 RU_LETTERS = 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
 
 
 class Letters:
-    RU = RU_LETTERS + RU_LETTERS.upper() + POSTFIX_LETTERS
-    EN = ascii_letters + POSTFIX_LETTERS
-    DIGITS = digits
+    RU = RU_LETTERS + RU_LETTERS.upper() + SPACE
+    EN = ascii_letters + SPACE
+    SYMBOLS = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~' + digits
     current: str
 
 
@@ -22,12 +22,8 @@ class BaseCrypto(object):
     def __init__(self, message: str, letters=None):
         self.message = message
         if letters:
-            try:
-                self.letters = letters
-                self._check_letters()
-            except SyntaxError:
-                self.letters = letters + Letters.DIGITS
-                self._check_letters()
+            self.letters = letters
+            self._check_letters()
         else:
             self.__set_letters__()
 
@@ -43,7 +39,7 @@ class BaseCrypto(object):
         """ Формирует подсказку на примере алфавита """
         old_message = self.message
         self.message = self.letters
-        hint = f"\n{self.letters}\n{self.encrypt()}"
+        hint = f"{self.letters}\n{self.encrypt()}"
         self.message = old_message
         return hint
 
@@ -51,19 +47,20 @@ class BaseCrypto(object):
         """ Выбирает язык символов алфавита En/Ru """
 
         # Перебор алфавитов
-        def roll_letters(with_digits=False):
+        def roll_letters(self, with_symbols=False):
             for i, key in enumerate(Letters.__dict__):
                 if i < len(Letters.__dict__):
                     if not key.startswith('__'):
-                        self.letters = Letters.__dict__[key] + Letters.DIGITS if with_digits else ''
+                        letters = Letters.__dict__[key]
+                        self.letters = letters + Letters.SYMBOLS if with_symbols else letters
                         if not self.__is_letters_error__():
-                            break
+                            return
 
-            if not with_digits:
-                roll_letters(with_digits=True)
+            if not with_symbols:
+                roll_letters(self, with_symbols=True)
 
             self._check_letters()
-        roll_letters()
+        roll_letters(self)
 
     def _check_letters(self):
         is_error = self.__is_letters_error__()
