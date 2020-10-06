@@ -3,3 +3,5 @@ env
 .idea
 *.pyc
 __pycache__
+/ссылка на репозиторий проекта.txt
+/crypto.zip
