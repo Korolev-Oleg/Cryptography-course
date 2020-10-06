@@ -60,6 +60,7 @@ class BaseCrypto(object):
                 roll_letters(self, with_symbols=True)
 
             self._check_letters()
+
         roll_letters(self)
 
     def _check_letters(self):
@@ -80,6 +81,14 @@ class BaseCrypto(object):
 
     def _chr(self, index: int) -> str:
         return list(self.letters)[index]
+
+    def test(self):
+        message = self.message
+        encrypted = self.encrypt()
+        self.message = encrypted
+        decrypted = self.decrypt()
+
+        return f"message:\t{message}\nencrypted:\t{encrypted}\ndecrypted:\t{decrypted}\nhint:\n{self.get_hint()}"
 
 
 if __name__ == '__main__':
