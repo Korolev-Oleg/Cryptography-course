@@ -92,5 +92,5 @@ class BaseCrypto(object):
 
 
 if __name__ == '__main__':
-    s = BaseCrypto('test руский')
+    s = BaseCrypto('test рюзке')
     print(s.letters)
