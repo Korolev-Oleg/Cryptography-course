@@ -24,7 +24,7 @@ def choice_letters():
     2) Свой
     3) {Letters.RU}
     4) {Letters.EN}
-    5) {Letters.DIGITS}
+    5) {Letters.SYMBOLS}
     6) Выход""")
 
     choice = int(input(': '))
@@ -37,10 +37,9 @@ def choice_letters():
     elif choice == 4:
         letters = Letters.EN
     elif choice == 5:
-        letters = Letters.DIGITS
+        letters = Letters.SYMBOLS
     else:
         exit()
-
 
     return letters
 
@@ -57,9 +56,9 @@ def choice_of_cipher(m, l):
     if choice == 1:
         chosen_cipher = Atbash(message=m, letters=l)
     elif choice == 2:
-        chosen_cipher = Cesar(message)
+        chosen_cipher = Cesar(message=m, letters=l)
     else:
-        chosen_cipher = PolybiusSquare(message)
+        chosen_cipher = PolybiusSquare(message=m, letters=l)
 
     return chosen_cipher
 
@@ -72,9 +71,9 @@ def choice_method(cipher):
     """)
     chose = int(input())
     if chose == 1:
-        return cipher.encrypt
+        return lambda: cipher.encrypt()
     else:
-        return cipher.decrypt
+        return lambda: cipher.decrypt()
 
 
 if __name__ == '__main__':
@@ -86,8 +85,10 @@ if __name__ == '__main__':
             cipher = choice_of_cipher(message, letters)
             cipher_method = choice_method(cipher)
             clear()
+            print('Подсказка шифра:')
+            print(cipher.get_hint(), '\n\n', 'Результат:')
             print('X =', message)
-            print('Y =', cipher_method())
+            print('Y =', cipher_method(), '\n')
             pause()
         except Exception as error:
             pause(error)
